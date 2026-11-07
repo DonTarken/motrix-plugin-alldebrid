@@ -14,6 +14,7 @@
   <a href="https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest"><img src="https://img.shields.io/github/v/release/DonTarken/motrix-plugin-alldebrid?label=Latest%20Release&color=success&style=for-the-badge" alt="Latest Release" /></a>
   <a href="https://motrix.app"><img src="https://img.shields.io/badge/Motrix-%3E%3D%202.0.0-orange?style=for-the-badge" alt="Motrix 2.0+" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://ko-fi.com/dontarken"><img src="https://img.shields.io/badge/Ko--fi-Support%20the%20Project-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support on Ko-fi" /></a>
 </p>
 
 <p align="center">
@@ -123,6 +124,18 @@ npm run build
 ```
 
 Compiled package will be saved in `dist/alldebrid-resolver.moext`.
+
+---
+
+## 💖 Support the Project
+
+If this plugin saves you time and speeds up your downloads, please consider supporting its development and maintenance. Every coffee counts! ☕
+
+<p align="center">
+  <a href="https://ko-fi.com/dontarken" target="_blank">
+    <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="40" alt="Buy Me a Coffee at ko-fi.com" />
+  </a>
+</p>
 
 ---
 
