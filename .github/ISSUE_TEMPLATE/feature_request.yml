@@ -1,0 +1,32 @@
+name: "💡 Feature Request"
+description: "Suggest a new idea or improvement for the AllDebrid Motrix plugin."
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make this plugin even better? Share it here! (English or French welcomed).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Does your request address a specific problem or limitation?"
+      description: "Describe the use case or current constraint."
+      placeholder: "e.g. I would like to be able to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed Solution or Feature"
+      description: "Describe how you envision this feature working."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives Considered"
+      description: "Have you considered any alternative workarounds?"

@@ -1,0 +1,78 @@
+name: "🐛 Bug Report"
+description: "Report an issue, unexpected behavior, connection problem, or failed link unrestrict."
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! (You can write in **English** or in **French**).
+        Please make sure beforehand that your AllDebrid account is active and has Premium status on [alldebrid.com](https://alldebrid.com).
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating System"
+      options:
+        - "Windows 11"
+        - "Windows 10"
+        - "macOS (Apple Silicon M1/M2/M3)"
+        - "macOS (Intel)"
+        - "Linux (Ubuntu / Debian)"
+        - "Linux (Other)"
+    validations:
+      required: true
+
+  - type: input
+    id: motrix_version
+    attributes:
+      label: "Motrix Version"
+      placeholder: "e.g. 2.0.0-beta.2"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: "Plugin Version"
+      placeholder: "e.g. 1.1.0"
+      value: "1.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: hoster
+    attributes:
+      label: "File Hoster (if applicable)"
+      placeholder: "e.g. 1fichier, Rapidgator, Turbobit, Mega, etc."
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Problem Description"
+      description: "Explain clearly what is happening."
+      placeholder: "e.g. When adding a 1fichier link, the link is not unrestricted and Motrix attempts to download the HTML web page..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      placeholder: |
+        1. Copy link '...'
+        2. Click '+' in Motrix
+        3. Observe error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Plugin Logs (optional but highly recommended)"
+      description: |
+        Logs are located at:
+        - Windows: `%APPDATA%\Motrix\plugins\_logs\community.alldebrid-resolver\logs\current.ndjson`
+        - macOS: `~/Library/Application Support/Motrix/plugins/_logs/community.alldebrid-resolver/logs/current.ndjson`
+        - Linux: `~/.config/Motrix/plugins/_logs/community.alldebrid-resolver/logs/current.ndjson`
+      render: shell

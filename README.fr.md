@@ -1,69 +1,134 @@
 # Plugin AllDebrid pour Motrix ⚡
 
-[![Licence : MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Motrix](https://img.shields.io/badge/Motrix->=2.0.0-orange.svg)](https://motrix.app)
-[![AllDebrid](https://img.shields.io/badge/AllDebrid-API%20v4-green.svg)](https://alldebrid.com)
+<p align="center">
+  <img src="https://alldebrid.com/static/images/logo.png" alt="AllDebrid Logo" width="180" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://motrix.app/release.ico" alt="Motrix Logo" width="80" />
+</p>
 
-Plugin communautaire officiel (`.moext`) pour le gestionnaire de téléchargement **[Motrix](https://motrix.app)** qui intercepte, débride et accélère automatiquement les liens d'hébergeurs de fichiers grâce à votre compte premium **[AllDebrid](https://alldebrid.com)**.
+<p align="center">
+  <b>Débridez et téléchargez vos fichiers à la vitesse maximale de votre fibre dans une interface moderne et épurée.</b>
+</p>
 
-Transformez Motrix en une alternative moderne, élégante et ultra-légère à **JDownloader** !
+<p align="center">
+  <a href="https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest"><img src="https://img.shields.io/github/v/release/DonTarken/motrix-plugin-alldebrid?label=Derni%C3%A8re%20version&color=success&style=for-the-badge" alt="Dernière version" /></a>
+  <a href="https://motrix.app"><img src="https://img.shields.io/badge/Motrix-%3E%3D%202.0.0-orange?style=for-the-badge" alt="Motrix 2.0+" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Licence-MIT-blue?style=for-the-badge" alt="Licence MIT" /></a>
+</p>
 
----
-
-## ✨ Fonctionnalités
-
-- **🚀 Débridage automatique et transparent** : Collez n'importe quel lien supporté (1fichier, Rapidgator, Turbobit, Mega, Katfile, DDownload, etc.) directement dans Motrix ou via l'extension de navigateur. Le plugin intercepte le lien et le remplace par le flux direct haute vitesse CDN.
-- **🛡️ Reconnaissance de compte style JDownloader** :
-  - Vérification automatique de votre clé API AllDebrid dès sa saisie dans les paramètres.
-  - Détection du statut d'abonnement, du nom d'utilisateur, de la date d'expiration et du nombre de jours restants.
-  - Commande dédiée : *"Vérifier le statut du compte AllDebrid"*.
-- **⚡ Vitesse de téléchargement maximale** : Exploite le moteur multi-sources **Aria2** de Motrix pour saturer votre connexion fibre grâce au téléchargement multi-connexions en parallèle (jusqu'à 16-64 threads).
-- **📦 Téléchargement groupé (Batch)** : Ajoutez 20 ou 50 liens d'archives découpées (`.part01.rar`, `.part02.rar`...) en une seule fois ; tous les liens sont résolus et mis en file d'attente automatiquement.
-- **🔄 Reprise des téléchargements (Resume)** : Les téléchargements interrompus peuvent être mis en pause et repris sans recommencer à 0 %.
-- **🏷️ Noms réels et tailles préservés** : Récupère les métadonnées et le vrai nom du fichier d'origine avant le début de l'écriture sur le disque.
-- **🔔 Notifications natives** : Alertes système discrètes lorsqu'un lien est débridé ou lors du contrôle de l'abonnement.
-- **⚡ Cache dynamique des hébergeurs** : Met en cache la liste des hébergeurs via `/v4/hosts` pour ne pas solliciter l'API sur des liens directs non débridables.
+<p align="center">
+  🇫🇷 <b>Français</b> &nbsp;|&nbsp; <a href="README.md">🇬🇧 English</a>
+</p>
 
 ---
 
-## 📥 Guide d'Installation dans Motrix
+## ⚡ Pourquoi ce plugin ?
 
-1. Assurez-vous d'avoir **Motrix v2.0.0 ou supérieur** installé sur votre ordinateur.
-2. Repérez le fichier **`alldebrid-resolver.moext`** généré dans le dossier `dist/` de ce dépôt.
-3. Ouvrez **Motrix**.
-4. Allez dans les **Préférences** (icône d'engrenage en bas à gauche) ➔ onglet **Plugins**.
-5. Cliquez sur **Installer un plugin** (ou glissez-déposez le fichier `alldebrid-resolver.moext`).
-6. Confirmez l'écran des permissions demandées (`http`, `notify`).
-7. Dans l'onglet des paramètres du plugin **AllDebrid** :
-   - Renseignez votre **Clé API AllDebrid** (générée sur [alldebrid.com/apikeys](https://alldebrid.com/apikeys)).
-   - Vérifiez que l'option **Activer le débridage automatique** est bien cochée.
-8. Une notification système confirme immédiatement que votre compte est **Premium Actif** avec votre solde de jours restants !
+Vous utilisez **Motrix** comme gestionnaire de téléchargement et vous possédez un compte premium **AllDebrid** ?
+
+Ce plugin officiel autonome (`.moext`) transforme Motrix en une alternative moderne, ultra-rapide et légère à **JDownloader** :
+- **Débridage 100% automatique** : collez vos liens (1fichier, Rapidgator, Turbobit, Mega, Katfile, etc.), Motrix les débride et lance le téléchargement immédiatement.
+- **Configuration simple par Clé API** : un simple copier-coller de votre clé API AllDebrid dans les paramètres de l'extension et le tour est joué.
+- **Vitesse maximale** : sature votre connexion (jusqu'à 100+ Mo/s sur fibre) grâce au moteur multi-connexions Aria2.
+- **100% Autonome** : s'installe directement dans le Motrix officiel de base sans aucune modification requise.
 
 ---
 
-## 🛠️ Utilisation quotidienne
+## 🚀 Tutoriel d'Installation Rapide
 
-Copiez simplement n'importe quel lien d'hébergeur supporté et collez-le dans Motrix (`Ctrl + N` ou bouton `+`). Motrix s'occupe de tout et lance le téléchargement à pleine vitesse.
+### Étape 1 : Installer l'extension dans Motrix (au choix)
 
-Vous pouvez aussi utiliser l'extension de navigateur Motrix pour faire un simple clic droit **"Télécharger avec Motrix"** sur n'importe quel lien web.
+#### ⚡ Méthode A : Directement via l'adresse GitHub (Recommandée — la plus simple)
+1. Ouvrez **Motrix** et cliquez sur l'onglet **« Extensions »** dans la barre latérale gauche (icône 📦 sous *Trackers*).
+2. Cliquez sur le bouton **`+`** tout en haut à droite pour ouvrir la fenêtre *« Ajouter une extension »*.
+3. Dans le champ, collez simplement l'adresse du dépôt :
+   ```text
+   https://github.com/DonTarken/motrix-plugin-alldebrid
+   ```
+   *(ou tapez simplement `DonTarken/motrix-plugin-alldebrid`)*
+4. Motrix détecte, télécharge et installe automatiquement la dernière version officielle ! Confirmez les autorisations.
 
 ---
 
-## 🏗️ Développement et Compilation
+#### 📁 Méthode B : Par fichier `.moext` local
+1. 👉 **[Téléchargez `alldebrid-resolver.moext`](https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest/download/alldebrid-resolver.moext)** (dernière version).
+2. Dans Motrix ➔ onglet **Extensions** ➔ cliquez sur le bouton **`+`** en haut à droite.
+3. **Glissez-déposez** le fichier téléchargé directement dans le champ de la fenêtre, ou cliquez sur l'icône trombone 📎 pour le sélectionner sur votre disque.
+4. Confirmez l'installation.
 
-Pour recompiler le paquet `.moext` à partir des sources :
+---
+
+### Étape 2 : Renseigner votre Clé API AllDebrid
+1. Sur la page **Extensions**, repérez la carte **AllDebrid Resolver** et cliquez sur le bouton **« Ouvrir »**.
+2. Récupérez votre clé API sur votre compte AllDebrid : **[alldebrid.com/apikeys](https://alldebrid.com/apikeys)**.
+3. Collez votre clé dans le champ **Clé API AllDebrid** et sauvegardez.
+4. Une notification confirme immédiatement que votre compte **Premium est actif** avec vos jours d'abonnement restants. C'est prêt ! 🎉
+
+---
+
+## 💡 Utilisation au quotidien
+
+* **Téléchargement individuel :** Copiez un lien d'hébergeur et collez-le dans Motrix (`Ctrl + N` ou bouton `+`).
+* **Téléchargement par lot (Batch) :** Collez 10, 20 ou 50 liens d'archives découpées d'un coup (`.part01.rar`, `.part02.rar`...) : ils sont tous débridés et mis en file d'attente automatiquement.
+* **Extension de navigateur :** Utilisez l'extension officielle Motrix pour Chrome ou Firefox : un simple clic droit **« Télécharger avec Motrix »** sur un lien d'hébergeur suffit !
+
+---
+
+## ❓ FAQ & Dépannage
+
+<details>
+<summary><b>Mon débit oscille ou la jauge reste bloquée à 0 o/s, que faire ?</b></summary>
+<br>
+
+Si vous téléchargez de très gros fichiers (fichiers vidéo de 20 à 60 Go), vérifiez où Motrix enregistre vos fichiers :
+- **Préférez un disque SSD (SATA ou NVMe)** plutôt qu'un vieux disque dur mécanique (HDD à 5400 RPM).
+- Sur un disque dur mécanique lent, l'allocation d'un fichier de 50 Go peut saturer l'écriture disque pendant plusieurs minutes, ce qui fige temporairement la jauge d'Aria2.
+- Sur SSD, l'espace est alloué instantanément et le débit monte immédiatement à 90–115 Mo/s sur connexion fibre 1 Gbps.
+</details>
+
+<details>
+<summary><b>Quels sont les hébergeurs pris en charge ?</b></summary>
+<br>
+
+Tous les hébergeurs supportés par votre compte AllDebrid : 1fichier, Rapidgator, Turbobit, Mega, Katfile, DDownload, Uptobox, Filefactory, Nitroflare, etc. Le plugin met à jour dynamiquement sa liste d'hébergeurs supportés chaque heure.
+</details>
+
+<details>
+<summary><b>Mes identifiants sont-ils en sécurité ?</b></summary>
+<br>
+
+**Absolument.** Le plugin n'a jamais accès à votre mot de passe AllDebrid. Votre clé API personnelle est stockée localement sur votre ordinateur dans les données sécurisées de Motrix.
+</details>
+
+---
+
+## 🐛 Un bug ? Une suggestion ?
+
+Votre retour nous intéresse pour améliorer constamment le plugin !
+
+* 👉 **[Signaler un bug (Bug Report)](https://github.com/DonTarken/motrix-plugin-alldebrid/issues/new?template=bug_report.yml)** : si un lien ne se débride pas ou si vous rencontrez une erreur.
+* 👉 **[Proposer une amélioration](https://github.com/DonTarken/motrix-plugin-alldebrid/issues/new?template=feature_request.yml)** : si vous avez une idée de fonctionnalité.
+
+---
+
+## 🛠️ Compilation manuelle (Développeurs)
+
+Si vous souhaitez modifier le code ou recompiler l'archive `.moext` :
 
 ```bash
+# Cloner le dépôt
 git clone https://github.com/DonTarken/motrix-plugin-alldebrid.git
 cd motrix-plugin-alldebrid
+
+# Compiler le paquet
 npm run build
 ```
 
-Le fichier compilé est généré dans `dist/alldebrid-resolver.moext`.
+Le fichier compilé est automatiquement généré dans `dist/alldebrid-resolver.moext`.
 
 ---
 
 ## 📄 Licence
 
-Ce projet est sous licence open-source [MIT](LICENSE).  
-Créé avec ❤️ par **[DonTarken](https://github.com/DonTarken)**.
+Ce projet est distribué sous licence open-source **[MIT](LICENSE)**.  
+Développé avec passion par **[DonTarken](https://github.com/DonTarken)**.

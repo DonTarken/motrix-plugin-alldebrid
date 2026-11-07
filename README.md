@@ -1,71 +1,132 @@
-# Motrix AllDebrid Resolver Plugin ⚡
+# AllDebrid Resolver Plugin for Motrix ⚡
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Motrix](https://img.shields.io/badge/Motrix->=2.0.0-orange.svg)](https://motrix.app)
-[![AllDebrid](https://img.shields.io/badge/AllDebrid-API%20v4-green.svg)](https://alldebrid.com)
+<p align="center">
+  <img src="https://alldebrid.com/static/images/logo.png" alt="AllDebrid Logo" width="180" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://motrix.app/release.ico" alt="Motrix Logo" width="80" />
+</p>
 
-*Français : Voir [README.fr.md](README.fr.md) pour la documentation en français.*
+<p align="center">
+  <b>Unrestrict and download files at full gigabit fiber speed within a sleek, modern UI.</b>
+</p>
 
-An official community plugin (`.moext`) for the **[Motrix](https://motrix.app)** download manager that automatically intercepts, unlocks, and accelerates file hoster links using your **[AllDebrid](https://alldebrid.com)** premium account.
+<p align="center">
+  <a href="https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest"><img src="https://img.shields.io/github/v/release/DonTarken/motrix-plugin-alldebrid?label=Latest%20Release&color=success&style=for-the-badge" alt="Latest Release" /></a>
+  <a href="https://motrix.app"><img src="https://img.shields.io/badge/Motrix-%3E%3D%202.0.0-orange?style=for-the-badge" alt="Motrix 2.0+" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
+</p>
 
-Turn Motrix into a sleek, fast, and modern alternative to **JDownloader**!
-
----
-
-## ✨ Features
-
-- **🚀 Transparent Automatic Unrestricting**: Paste any supported link (1fichier, Rapidgator, Turbobit, Mega, Katfile, DDownload, etc.) directly into Motrix or use the browser extension. The plugin intercepts it and replaces it with the high-speed direct CDN stream.
-- **🛡️ JDownloader-Style Account Recognition**: 
-  - Automatically verifies your AllDebrid API key when entered in Motrix Settings.
-  - Detects account status, username, expiration date, and remaining days.
-  - Dedicated command: *"Check AllDebrid Account Status"*.
-- **⚡ Maximum Download Speeds**: Leverages Motrix's built-in **Aria2** engine to saturate your internet connection with multi-threaded, parallel connections (up to 16-64 threads).
-- **📦 Batch / Multi-Link Support**: Add 20 or 50 split archive links (`.part01.rar`, `.part02.rar`...) in a single step; all links are resolved and queued automatically.
-- **🔄 Resume Support**: Interrupted downloads can be paused and resumed without restarting from 0%.
-- **🏷️ Real Filenames & Sizes**: Fetches original file names and sizes from the hoster before starting disk writes.
-- **🔔 Native Notifications**: Discreet system alerts when a download is successfully unlocked or when subscription status changes.
-- **⚡ Dynamic Hoster Cache**: Periodically caches supported domains via `/v4/hosts` to minimize network overhead on non-debrid links.
+<p align="center">
+  <a href="README.fr.md">🇫🇷 Lire en Français</a> &nbsp;|&nbsp; 🇬🇧 <b>English</b>
+</p>
 
 ---
 
-## 📥 Installation in Motrix
+## ⚡ Why Use This Plugin?
 
-1. Make sure you have **Motrix v2.0.0 or later** installed.
-2. Locate the packaged file **`alldebrid-resolver.moext`** in the `dist/` folder of this repository (or download it from Releases).
-3. Open **Motrix**.
-4. Go to **Preferences** (gear icon) ➔ **Plugins**.
-5. Click **Install Plugin** (or drag & drop `alldebrid-resolver.moext` into the window).
-6. Review and confirm the requested permissions (`http`, `notify`).
-7. In the **AllDebrid** plugin settings tab:
-   - Enter your **AllDebrid API Key** (generate one on [alldebrid.com/apikeys](https://alldebrid.com/apikeys)).
-   - Ensure **Enable Automatic Unrestricting** is checked.
-8. A notification will confirm that your account is recognized as **Premium Active**!
+Do you use **Motrix** as your daily download manager and hold an **AllDebrid** premium subscription?
+
+This autonomous official plugin (`.moext`) transforms Motrix into a modern, lightning-fast, and lightweight alternative to **JDownloader**:
+- **100% Automatic Unrestricting**: Paste any supported link (1fichier, Rapidgator, Turbobit, Mega, Katfile, etc.), and Motrix instantly unlocks the high-speed CDN stream.
+- **Simple API Key Configuration**: Quickly paste your personal API key into the extension settings and you're good to go.
+- **Max Throughput**: Saturates your gigabit fiber connection (up to 100+ MB/s) powered by Motrix's Aria2 multi-connection engine.
+- **100% Autonomous**: Runs on vanilla, unpatched Motrix 2.0+ with zero core modifications required.
 
 ---
 
-## 🛠️ Usage
+## 🚀 Quick Installation Guide
 
-Simply copy any supported download link and paste it into Motrix (`Ctrl + N` or `+` button). Motrix will automatically unlock the link and download it at full speed.
+### Step 1: Install the Extension in Motrix (Choose One)
 
-You can also right-click any link in your browser and choose **"Download with Motrix"** if you have the *Motrix WebExtension* installed.
+#### ⚡ Method A: Directly via GitHub URL (Recommended — Fastest)
+1. Open **Motrix** and click on the **"Extensions"** tab in the left navigation sidebar (package icon 📦 below *Trackers*).
+2. Click the **`+`** button in the upper-right corner to open the *"Add an extension"* modal.
+3. In the input field, simply paste the repository URL:
+   ```text
+   https://github.com/DonTarken/motrix-plugin-alldebrid
+   ```
+   *(or simply enter `DonTarken/motrix-plugin-alldebrid`)*
+4. Motrix will automatically download and install the latest official release! Confirm the requested permissions.
 
 ---
 
-## 🏗️ Development & Building
+#### 📁 Method B: Via Local `.moext` File
+1. 👉 **[Download `alldebrid-resolver.moext`](https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest/download/alldebrid-resolver.moext)** (latest release).
+2. In Motrix ➔ **Extensions** tab ➔ click the **`+`** button in the upper-right corner.
+3. **Drag and drop** the downloaded file directly into the input field, or click the paperclip icon 📎 to choose it from your files.
+4. Confirm the installation.
 
-To rebuild the `.moext` package:
+---
+
+### Step 2: Enter Your AllDebrid API Key
+1. On the **Extensions** page, locate the **AllDebrid Resolver** card and click the **"Open"** button.
+2. Retrieve your personal API key from your AllDebrid account: **[alldebrid.com/apikeys](https://alldebrid.com/apikeys)**.
+3. Paste your key into the **AllDebrid API Key** field and save.
+4. A notification confirms your **Premium status is active** with your remaining days. You're ready to download! 🎉
+
+---
+
+## 💡 Daily Usage
+
+* **Single Download:** Copy any filehoster link and paste it into Motrix (`Ctrl + N` or `+` button).
+* **Batch Downloads:** Paste 10, 20, or 50 split archive parts (`.part01.rar`, `.part02.rar`...); all links are unrestricted and queued in parallel.
+* **Browser Extension:** Use Motrix's Chrome or Firefox extension to right-click **"Download with Motrix"** on any link on the web.
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+<details>
+<summary><b>My download speed fluctuates or the progress bar is stuck at 0 B/s?</b></summary>
+<br>
+
+If downloading very large files (e.g. 20 to 60 GB video files), check where Motrix is writing:
+- **Use an SSD (SATA or NVMe)** instead of a 5400 RPM mechanical HDD.
+- On slow mechanical drives, allocating a 50 GB file can saturate Windows NTFS I/O queues for minutes, temporarily starving Aria2's RPC statistics loop.
+- On an SSD, space is allocated instantly and speeds jump straight to 90–115 MB/s on gigabit fiber.
+</details>
+
+<details>
+<summary><b>Which hosters are supported?</b></summary>
+<br>
+
+All filehosters supported by your AllDebrid account: 1fichier, Rapidgator, Turbobit, Mega, Katfile, DDownload, Uptobox, Filefactory, Nitroflare, and more. The plugin refreshes the supported hosts list automatically every hour.
+</details>
+
+<details>
+<summary><b>Are my account credentials safe?</b></summary>
+<br>
+
+**100% safe.** The plugin never asks for nor accesses your AllDebrid password. Your personal API key is stored locally on your machine within Motrix's secure application data.
+</details>
+
+---
+
+## 🐛 Issues & Feature Requests
+
+Encountered an issue or have an idea to improve the plugin?
+
+* 👉 **[Report a Bug](https://github.com/DonTarken/motrix-plugin-alldebrid/issues/new?template=bug_report.yml)**: If a link fails to unrestrict or you experience unexpected behavior.
+* 👉 **[Request a Feature](https://github.com/DonTarken/motrix-plugin-alldebrid/issues/new?template=feature_request.yml)**: Share your ideas for future improvements.
+
+---
+
+## 🛠️ Building from Source (Developers)
 
 ```bash
+# Clone the repository
 git clone https://github.com/DonTarken/motrix-plugin-alldebrid.git
 cd motrix-plugin-alldebrid
+
+# Build the .moext package
 npm run build
 ```
 
-The output bundle will be generated in `dist/alldebrid-resolver.moext`.
+Compiled package will be saved in `dist/alldebrid-resolver.moext`.
 
 ---
 
 ## 📄 License
 
-This project is open-source under the [MIT License](LICENSE).
-Created with ❤️ by **[DonTarken](https://github.com/DonTarken)**.
+Open-source under the **[MIT](LICENSE)** license.  
+Crafted with passion by **[DonTarken](https://github.com/DonTarken)**.
