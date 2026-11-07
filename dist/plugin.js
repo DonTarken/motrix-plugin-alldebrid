@@ -317,18 +317,6 @@ commands.register("community.alldebrid-resolver.checkAccount", async () => {
   await checkAccount(apiKey, true);
 });
 
-/**
- * Écouteur de changement de configuration (vérification automatique dès que la clé est modifiée)
- */
-config.onChange(async (key) => {
-  if (key === "apiKey") {
-    const newKey = ((await config.get("apiKey")) || "").trim();
-    if (newKey) {
-      await checkAccount(newKey, true);
-    }
-  }
-});
-
 lifecycle.onDeactivate(async () => {
   log.info("AllDebrid Resolver désactivé.");
 });
