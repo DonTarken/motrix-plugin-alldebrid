@@ -24,7 +24,7 @@
       {
         "id": "community.alldebrid-resolver.checkAccount",
         "title": "%cmd.checkAccount%",
-        "public": true
+        "public": false
       }
     ],
     "hooks": {
