@@ -178,17 +178,23 @@ async function getSupportedDomains() {
   return cachedDomains;
 }
 
+function extractHostname(url) {
+  if (!url || typeof url !== "string") return "";
+  const m = url.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);
+  if (!m) return "";
+  let host = m[1];
+  if (host.includes("@")) host = host.split("@").pop();
+  if (host.includes(":")) host = host.split(":")[0];
+  return host.toLowerCase();
+}
+
 function isSupportedHost(url, domains) {
   if (!domains || domains.size === 0) return true; // Tente le débridage par défaut si le cache est indisponible
-  try {
-    const parsedUrl = new URL(url);
-    const host = parsedUrl.hostname.toLowerCase();
-    if (domains.has(host)) return true;
-    for (const d of domains) {
-      if (host.endsWith("." + d)) return true;
-    }
-  } catch {
-    return false;
+  const host = extractHostname(url);
+  if (!host) return false;
+  if (domains.has(host)) return true;
+  for (const d of domains) {
+    if (host === d || host.endsWith("." + d)) return true;
   }
   return false;
 }
