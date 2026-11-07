@@ -279,14 +279,11 @@ hooks.beforeCreate(async (ctx) => {
         filename: result.filename
       });
 
-      const updateData = {
+      // Seule la liste d'URIs est mise à jour (le nom de fichier est déjà présent dans l'URL directe AllDebrid)
+      // Ne pas injecter filename pour éviter d'exiger la permission fs.task.write
+      ctx.update({
         uris: [result.directUrl]
-      };
-      if (result.filename) {
-        updateData.filename = result.filename;
-      }
-
-      ctx.update(updateData);
+      });
 
       const showNotif = await config.get("showNotification");
       if (showNotif !== false) {
