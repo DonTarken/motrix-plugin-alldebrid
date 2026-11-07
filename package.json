@@ -1,0 +1,23 @@
+{
+  "name": "motrix-plugin-alldebrid",
+  "version": "1.0.0",
+  "description": "AllDebrid download resolver plugin for Motrix download manager",
+  "main": "dist/plugin.js",
+  "scripts": {
+    "build": "node scripts/build-moext.js"
+  },
+  "keywords": [
+    "motrix",
+    "motrix-plugin",
+    "moext",
+    "alldebrid",
+    "debrid",
+    "download-manager"
+  ],
+  "author": "DonTarken",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DonTarken/motrix-plugin-alldebrid.git"
+  }
+}

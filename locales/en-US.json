@@ -1,0 +1,12 @@
+{
+  "name": "AllDebrid Resolver",
+  "description": "Automatically unlocks and debrids supported download links using your AllDebrid premium account.",
+  "cmd.checkAccount": "Check AllDebrid Account Status",
+  "settings.title": "AllDebrid",
+  "settings.apiKey.title": "API Key",
+  "settings.apiKey.desc": "Your AllDebrid API key (generated on alldebrid.com/apikeys)",
+  "settings.enabled.title": "Enable Automatic Unrestricting",
+  "settings.enabled.desc": "Automatically intercept and unrestrict supported file hoster links.",
+  "settings.showNotification.title": "Show Notifications",
+  "settings.showNotification.desc": "Display notifications when links are unrestricted or account status updates."
+}
