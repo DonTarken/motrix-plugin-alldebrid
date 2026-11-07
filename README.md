@@ -38,15 +38,15 @@ This autonomous official plugin (`.moext`) transforms Motrix into a modern, ligh
 
 ### Step 1: Install the Extension in Motrix (Choose One)
 
-#### ⚡ Method A: Directly via GitHub URL (Recommended — Fastest)
+#### ⚡ Method A: Directly via GitHub (Recommended — Fastest)
 1. Open **Motrix** and click on the **"Extensions"** tab in the left navigation sidebar (package icon 📦 below *Trackers*).
 2. Click the **`+`** button in the upper-right corner to open the *"Add an extension"* modal.
-3. In the input field, simply paste the repository URL:
+3. In the input field, simply enter the repository name:
    ```text
-   https://github.com/DonTarken/motrix-plugin-alldebrid
+   DonTarken/motrix-plugin-alldebrid
    ```
-   *(or simply enter `DonTarken/motrix-plugin-alldebrid`)*
-4. Motrix will automatically download and install the latest official release! Confirm the requested permissions.
+   *(The badge below will switch to **`Detected type: GitHub`** — make sure not to prefix it with `https://` so Motrix queries GitHub releases directly).*
+4. Click the search icon 🔍 in the lower-right corner (or press Enter). Motrix will automatically download the official release and prompt you to confirm the installation!
 
 ---
 

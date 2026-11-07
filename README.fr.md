@@ -38,15 +38,15 @@ Ce plugin officiel autonome (`.moext`) transforme Motrix en une alternative mode
 
 ### Étape 1 : Installer l'extension dans Motrix (au choix)
 
-#### ⚡ Méthode A : Directement via l'adresse GitHub (Recommandée — la plus simple)
+#### ⚡ Méthode A : Directement via GitHub (Recommandée — la plus simple)
 1. Ouvrez **Motrix** et cliquez sur l'onglet **« Extensions »** dans la barre latérale gauche (icône 📦 sous *Trackers*).
 2. Cliquez sur le bouton **`+`** tout en haut à droite pour ouvrir la fenêtre *« Ajouter une extension »*.
-3. Dans le champ, collez simplement l'adresse du dépôt :
+3. Dans le champ, saisissez simplement le nom du dépôt :
    ```text
-   https://github.com/DonTarken/motrix-plugin-alldebrid
+   DonTarken/motrix-plugin-alldebrid
    ```
-   *(ou tapez simplement `DonTarken/motrix-plugin-alldebrid`)*
-4. Motrix détecte, télécharge et installe automatiquement la dernière version officielle ! Confirmez les autorisations.
+   *(Le badge en bas affichera **`Type détecté : GitHub`** — veillez à ne pas mettre `https://` devant pour que Motrix interroge directement les releases GitHub).*
+4. Cliquez sur l'icône loupe 🔍 en bas à droite (ou appuyez sur Entrée). Motrix télécharge automatiquement la dernière version officielle et vous demande de confirmer l'installation !
 
 ---
 
