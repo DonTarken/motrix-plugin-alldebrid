@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-import { commands, config, hooks, http, lifecycle, log, notify } from "motrix:plugin-api";
+import { commands, config, hooks, http, lifecycle, log, notify, storage } from "motrix:plugin-api";
 
 const AGENT_NAME = "motrix-alldebrid";
 const API_BASE = "https://api.alldebrid.com/v4";
@@ -48,11 +48,45 @@ function getDaysRemaining(ts) {
 }
 
 /**
+ * Récupération de la clé API AllDebrid :
+ * 1. Depuis les paramètres de l'extension (config.get("apiKey"))
+ * 2. Repli éventuel depuis le stockage persistant (storage.get("apiKey"))
+ */
+async function getApiKey() {
+  try {
+    const fromConfig = await config.get("apiKey");
+    if (fromConfig && typeof fromConfig === "string" && fromConfig.trim()) {
+      return fromConfig.trim();
+    }
+  } catch (e) {
+    log.debug("Lecture config impossible", { err: String(e) });
+  }
+
+  try {
+    const stored = await storage.get("apiKey");
+    if (stored && typeof stored === "string" && stored.trim()) {
+      return stored.trim();
+    }
+  } catch (e) {
+    log.debug("Lecture storage impossible", { err: String(e) });
+  }
+
+  return null;
+}
+
+/**
  * Vérification du compte et de l'abonnement Premium via l'API AllDebrid /v4/user
  */
 async function checkAccount(apiKey, triggerNotification = false) {
   if (!apiKey) {
     log.warn("AllDebrid: Clé API manquante");
+    if (triggerNotification) {
+      await notify.show({
+        title: "AllDebrid",
+        body: "Aucune clé API configurée. Rendez-vous dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
+        icon: "warning"
+      });
+    }
     return null;
   }
 
@@ -93,7 +127,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
         if (u.isPremium) {
           await notify.show({
             title: "AllDebrid — Compte Premium Actif",
-            body: `Utilisateur : ${u.username} | Valide jusqu'au ${expDate} (${days} jours restants).`,
+            body: `Utilisateur : ${u.username} | Expire le ${expDate} (${days} jours restants).`,
             icon: "success"
           });
         } else {
@@ -189,7 +223,7 @@ function extractHostname(url) {
 }
 
 function isSupportedHost(url, domains) {
-  if (!domains || domains.size === 0) return true; // Tente le débridage par défaut si le cache est indisponible
+  if (!domains || domains.size === 0) return true;
   const host = extractHostname(url);
   if (!host) return false;
   if (domains.has(host)) return true;
@@ -257,9 +291,17 @@ hooks.beforeCreate(async (ctx) => {
   const enabled = await config.get("enabled");
   if (enabled === false) return ctx;
 
-  const apiKey = ((await config.get("apiKey")) || "").trim();
+  const apiKey = await getApiKey();
   if (!apiKey) {
-    log.warn("AllDebrid: Clé API absente des paramètres");
+    log.warn("AllDebrid: Aucune clé API configurée.");
+    try {
+      await notify.show({
+        title: "AllDebrid — Configuration requise",
+        body: "Veuillez renseigner votre clé API dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
+        icon: "warning",
+        urgency: "low"
+      });
+    } catch {}
     return ctx;
   }
 
@@ -279,8 +321,7 @@ hooks.beforeCreate(async (ctx) => {
         filename: result.filename
       });
 
-      // Seule la liste d'URIs est mise à jour (le nom de fichier est déjà présent dans l'URL directe AllDebrid)
-      // Ne pas injecter filename pour éviter d'exiger la permission fs.task.write
+      // Seule la liste d'URIs est mise à jour (nom de fichier extrait automatiquement de l'URL CDN)
       ctx.update({
         uris: [result.directUrl]
       });
@@ -308,15 +349,7 @@ hooks.beforeCreate(async (ctx) => {
  * Commande manuelle pour vérifier l'état du compte
  */
 commands.register("community.alldebrid-resolver.checkAccount", async () => {
-  const apiKey = ((await config.get("apiKey")) || "").trim();
-  if (!apiKey) {
-    await notify.show({
-      title: "AllDebrid",
-      body: "Veuillez renseigner votre clé API dans les Paramètres de Motrix.",
-      icon: "info"
-    });
-    return;
-  }
+  const apiKey = await getApiKey();
   await checkAccount(apiKey, true);
 });
 

@@ -101,12 +101,24 @@ function createZipArchive(files) {
 
 function build() {
   const rootDir = path.resolve(__dirname, '..');
+  const srcJsPath = path.join(rootDir, 'src', 'index.js');
+  const distDir = path.join(rootDir, 'dist');
+  const pluginJsPath = path.join(distDir, 'plugin.js');
   const manifestPath = path.join(rootDir, 'motrix-plugin.json');
-  const pluginJsPath = path.join(rootDir, 'dist', 'plugin.js');
   const localeEnPath = path.join(rootDir, 'locales', 'en-US.json');
   const localeFrPath = path.join(rootDir, 'locales', 'fr-FR.json');
 
   console.log('📦 Construction du package Motrix (.moext)...');
+
+  if (!fs.existsSync(distDir)) {
+    fs.mkdirSync(distDir, { recursive: true });
+  }
+
+  // Synchronisation de src/index.js vers dist/plugin.js
+  if (fs.existsSync(srcJsPath)) {
+    fs.copyFileSync(srcJsPath, pluginJsPath);
+    console.log('🔄 dist/plugin.js synchronisé depuis src/index.js');
+  }
 
   if (!fs.existsSync(manifestPath)) {
     throw new Error('motrix-plugin.json manquant');
@@ -133,7 +145,6 @@ function build() {
   const moextBuffer = createZipArchive(filesToPack);
 
   // Écriture du fichier versionné et du fichier standard
-  const distDir = path.join(rootDir, 'dist');
   if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });
   }

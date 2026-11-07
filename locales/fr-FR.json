@@ -4,7 +4,7 @@
   "cmd.checkAccount": "Vérifier le statut du compte AllDebrid",
   "settings.title": "AllDebrid",
   "settings.apiKey.title": "Clé API AllDebrid",
-  "settings.apiKey.desc": "Votre clé API AllDebrid (générée sur alldebrid.com/apikeys)",
+  "settings.apiKey.desc": "Votre clé API personnelle AllDebrid (générée sur alldebrid.com/apikeys).",
   "settings.enabled.title": "Activer le débridage automatique",
   "settings.enabled.desc": "Intercepte et débride automatiquement les liens d'hébergeurs supportés.",
   "settings.showNotification.title": "Afficher les notifications",
