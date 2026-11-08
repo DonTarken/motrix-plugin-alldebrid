@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/social-preview.jpg" alt="Motrix AllDebrid Resolver Plugin" width="100%" />
+</p>
+
 # Plugin AllDebrid pour Motrix ⚡
 
 <p align="center">
