@@ -12,8 +12,6 @@ export const state = {
 };
 
 export function resetMockState() {
-  state.registeredCommands.clear();
-  state.beforeCreateHook = null;
   state.logs.length = 0;
   state.notifications.length = 0;
   state.httpRequests.length = 0;

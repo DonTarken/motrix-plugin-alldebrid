@@ -5,7 +5,8 @@ import {
   extractHostname,
   isSupportedHost,
   unlockLink,
-  getSupportedDomains
+  getSupportedDomains,
+  resetHostsCache
 } from "../src/index.js";
 import { state, resetMockState } from "./mock-api.mjs";
 
@@ -71,11 +72,38 @@ describe("Fail-Closed Policy & Host Validation (isSupportedHost)", () => {
     assert.equal(isSupportedHost("https://rapidgator.net.evil.org/file", sampleDomains), false);
     assert.equal(isSupportedHost("https://fakerapidgator.net/file", sampleDomains), false);
   });
+
+  it("ensures unsupported URLs are never sent to /link/unlock and leave downloads unchanged", async () => {
+    resetMockState();
+    state.configStore.set("apiKey", "VALID_KEY_123");
+    // Mock /hosts with only rapidgator
+    state.httpMockResponse = {
+      status: 200,
+      body: JSON.stringify({
+        status: "success",
+        data: { hosts: { h1: { domains: ["rapidgator.net"] } } }
+      })
+    };
+
+    const ctx = {
+      type: "http",
+      uris: ["https://private-server.org/confidential-archive.zip"],
+      update: (patch) => { Object.assign(ctx, patch); }
+    };
+
+    const result = await state.beforeCreateHook(ctx);
+
+    // Verify /link/unlock was NEVER called
+    const unlockCalls = state.httpRequests.filter(r => r.url.includes("/link/unlock"));
+    assert.equal(unlockCalls.length, 0, "Unsupported URL must NEVER be sent to /link/unlock!");
+    assert.equal(result.uris[0], "https://private-server.org/confidential-archive.zip", "Original URL must remain untouched");
+  });
 });
 
 describe("Network Security, Bearer Auth & Diagnostic Sanitization", () => {
   beforeEach(() => {
     resetMockState();
+    resetHostsCache();
   });
 
   it("unlockLink uses Authorization: Bearer header and does not expose apikey in query", async () => {
@@ -142,12 +170,33 @@ describe("Network Security, Bearer Auth & Diagnostic Sanitization", () => {
     assert.ok(initialCache);
     assert.equal(initialCache.has("turbobit.net"), true);
 
-    // Second call: simulated network failure (500 or timeout)
+    // Second call: simulated network failure (500 or timeout) with forced refresh
     state.httpMockResponse = { status: 500, body: "Internal Server Error" };
 
     // Previous cache must be retained if refresh fails
-    const refreshedCache = await getSupportedDomains();
+    const refreshedCache = await getSupportedDomains(true);
     assert.ok(refreshedCache, "Previous cache must be preserved on HTTP 500");
     assert.equal(refreshedCache.has("turbobit.net"), true);
+  });
+
+  it("handles request timeouts when fetching hosts list without failing open", async () => {
+    state.httpMockResponse = () => {
+      const timeoutErr = new Error("Connection timed out after 8000ms");
+      timeoutErr.name = "TimeoutError";
+      throw timeoutErr;
+    };
+    const domains = await getSupportedDomains();
+    assert.ok(domains === null || domains instanceof Set);
+    assert.equal(isSupportedHost("https://unsupported-host.org/test", domains), false);
+  });
+
+  it("handles invalid JSON responses from /hosts gracefully without failing open", async () => {
+    state.httpMockResponse = {
+      status: 200,
+      body: "<html>502 Bad Gateway - Not JSON</html>"
+    };
+    const domains = await getSupportedDomains();
+    assert.ok(domains === null || domains instanceof Set);
+    assert.equal(isSupportedHost("https://unsupported-host.org/test", domains), false);
   });
 });

@@ -223,9 +223,9 @@ let cachedDomains = null;
 let lastHostsRefresh = 0;
 const HOSTS_CACHE_TTL = 3600000; // 1 hour
 
-async function getSupportedDomains() {
+async function getSupportedDomains(forceRefresh = false) {
   const now = Date.now();
-  if (cachedDomains && now - lastHostsRefresh < HOSTS_CACHE_TTL) {
+  if (!forceRefresh && cachedDomains && now - lastHostsRefresh < HOSTS_CACHE_TTL) {
     return cachedDomains;
   }
 
@@ -442,12 +442,18 @@ lifecycle.onDeactivate(async () => {
 });
 
 // Exports for automated unit tests
+function resetHostsCache() {
+  cachedDomains = null;
+  lastHostsRefresh = 0;
+}
+
 export {
   shouldSkip,
   extractHostname,
   isSupportedHost,
   unlockLink,
   getSupportedDomains,
+  resetHostsCache,
   getApiKey,
   checkAccount,
 };
