@@ -273,9 +273,12 @@ function extractHostname(url) {
 }
 
 function isSupportedHost(url, domains) {
-  if (!domains || domains.size === 0) return true;
+  // Fail closed : si la liste est absente ou vide, on refuse systématiquement
+  if (!domains || domains.size === 0) return false;
+
   const host = extractHostname(url);
   if (!host) return false;
+
   if (domains.has(host)) return true;
   for (const d of domains) {
     if (host === d || host.endsWith("." + d)) return true;
