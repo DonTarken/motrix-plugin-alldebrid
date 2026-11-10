@@ -1,9 +1,11 @@
 {
   "name": "motrix-plugin-alldebrid",
   "version": "1.1.0",
+  "type": "module",
   "description": "AllDebrid download resolver plugin for Motrix download manager",
   "main": "dist/plugin.js",
   "scripts": {
+    "test": "node --import ./tests/setup.mjs --test",
     "build": "node scripts/build-moext.js"
   },
   "keywords": [

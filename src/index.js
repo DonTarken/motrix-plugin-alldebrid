@@ -1,33 +1,61 @@
 /**
  * Motrix AllDebrid Resolver Plugin
- * 
+ *
  * Intercepte automatiquement les liens d'hébergeurs supportés ajoutés dans Motrix,
  * les débride via l'API officielle AllDebrid v4, et transmet le lien direct haute vitesse à Aria2.
- * 
+ *
  * @author DonTarken
  * @license MIT
  */
 
-import { commands, config, hooks, http, lifecycle, log, notify, storage } from "motrix:plugin-api";
+import {
+  commands,
+  config,
+  hooks,
+  http,
+  lifecycle,
+  log,
+  notify,
+  storage,
+} from "motrix:plugin-api";
 
 const AGENT_NAME = "motrix-alldebrid";
 const API_BASE = "https://api.alldebrid.com/v4";
 
-// Domaines et préfixes à ignorer systématiquement
+// Domaines racines AllDebrid & dérivés à exclure strictement du débridage
+const EXCLUDED_HOSTS = [
+  "alldebrid.com",
+  "alldeb.ovh",
+  "debrid.it",
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+];
+
+// Vérification stricte du nom d'hôte (évite les faux positifs dans le chemin ou la query)
 function shouldSkip(url) {
   if (!url || typeof url !== "string") return true;
-  const lower = url.toLowerCase();
-  return (
+  const lower = url.trim().toLowerCase();
+
+  // Protocoles non-HTTP
+  if (
     lower.startsWith("data:") ||
     lower.startsWith("blob:") ||
-    lower.startsWith("file:") ||
-    lower.includes("localhost") ||
-    lower.includes("127.0.0.1") ||
-    lower.includes("[::1]") ||
-    lower.includes("alldebrid.com") ||
-    lower.includes("alldeb.ovh") ||
-    lower.includes("debrid.it")
-  );
+    lower.startsWith("file:")
+  ) {
+    return true;
+  }
+
+  const host = extractHostname(lower);
+  if (!host) return true;
+
+  for (const d of EXCLUDED_HOSTS) {
+    if (host === d || host.endsWith("." + d)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // Formatage de la date d'expiration
@@ -43,7 +71,7 @@ function formatUnixTimestamp(ts) {
 // Calcul des jours restants
 function getDaysRemaining(ts) {
   if (!ts || isNaN(ts)) return 0;
-  const diff = (ts * 1000) - Date.now();
+  const diff = ts * 1000 - Date.now();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
@@ -84,7 +112,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
       await notify.show({
         title: "AllDebrid",
         body: "Aucune clé API configurée. Rendez-vous dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
-        icon: "warning"
+        icon: "warning",
       });
     }
     return null;
@@ -96,7 +124,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
       method: "GET",
       url,
       responseType: "text",
-      timeoutMs: 10000
+      timeoutMs: 10000,
     });
 
     if (res.status !== 200) {
@@ -105,7 +133,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
         await notify.show({
           title: "AllDebrid — Erreur",
           body: `Échec de communication avec AllDebrid (HTTP ${res.status})`,
-          icon: "error"
+          icon: "error",
         });
       }
       return null;
@@ -120,7 +148,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
       log.info("AllDebrid: Compte validé", {
         username: u.username,
         isPremium: u.isPremium,
-        daysRemaining: days
+        daysRemaining: days,
       });
 
       if (triggerNotification) {
@@ -128,13 +156,13 @@ async function checkAccount(apiKey, triggerNotification = false) {
           await notify.show({
             title: "AllDebrid — Compte Premium Actif",
             body: `Utilisateur : ${u.username} | Expire le ${expDate} (${days} jours restants).`,
-            icon: "success"
+            icon: "success",
           });
         } else {
           await notify.show({
             title: "AllDebrid — Non Premium",
             body: `Compte ${u.username} reconnu, mais l'abonnement Premium a expiré.`,
-            icon: "error"
+            icon: "error",
           });
         }
       }
@@ -147,7 +175,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
         await notify.show({
           title: "AllDebrid — Erreur d'authentification",
           body: `Erreur : ${errCode} (${errMsg})`,
-          icon: "error"
+          icon: "error",
         });
       }
     }
@@ -157,7 +185,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
       await notify.show({
         title: "AllDebrid — Erreur",
         body: `Impossible de vérifier le compte : ${String(e)}`,
-        icon: "error"
+        icon: "error",
       });
     }
   }
@@ -173,7 +201,7 @@ const HOSTS_CACHE_TTL = 3600000; // 1 heure
 
 async function getSupportedDomains() {
   const now = Date.now();
-  if (cachedDomains && (now - lastHostsRefresh < HOSTS_CACHE_TTL)) {
+  if (cachedDomains && now - lastHostsRefresh < HOSTS_CACHE_TTL) {
     return cachedDomains;
   }
 
@@ -183,7 +211,7 @@ async function getSupportedDomains() {
       method: "GET",
       url,
       responseType: "text",
-      timeoutMs: 8000
+      timeoutMs: 8000,
     });
 
     if (res.status === 200 && res.body) {
@@ -201,12 +229,16 @@ async function getSupportedDomains() {
         }
         cachedDomains = domains;
         lastHostsRefresh = now;
-        log.info("AllDebrid: Liste des hébergeurs rafraîchie", { count: domains.size });
+        log.info("AllDebrid: Liste des hébergeurs rafraîchie", {
+          count: domains.size,
+        });
         return domains;
       }
     }
   } catch (e) {
-    log.warn("AllDebrid: Échec de récupération de la liste des hébergeurs", { err: String(e) });
+    log.warn("AllDebrid: Échec de récupération de la liste des hébergeurs", {
+      err: String(e),
+    });
   }
 
   return cachedDomains;
@@ -214,12 +246,30 @@ async function getSupportedDomains() {
 
 function extractHostname(url) {
   if (!url || typeof url !== "string") return "";
-  const m = url.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);
-  if (!m) return "";
-  let host = m[1];
-  if (host.includes("@")) host = host.split("@").pop();
-  if (host.includes(":")) host = host.split(":")[0];
-  return host.toLowerCase();
+  // Extraction de l'autorité entre :// et le premier /, ? ou #
+  const match = url.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);
+  if (!match) return "";
+
+  let host = match[1].toLowerCase();
+
+  // Retrait des credentials éventuels (user:pass@host)
+  if (host.includes("@")) {
+    host = host.split("@").pop();
+  }
+
+  // Gestion des adresses IPv6 entre crochets [::1]:port
+  if (host.startsWith("[")) {
+    const bracketEnd = host.indexOf("]");
+    if (bracketEnd !== -1) {
+      return host.slice(0, bracketEnd + 1);
+    }
+  }
+
+  // Retrait du port (host:8080)
+  if (host.includes(":")) {
+    host = host.split(":")[0];
+  }
+  return host.trim();
 }
 
 function isSupportedHost(url, domains) {
@@ -244,18 +294,20 @@ async function unlockLink(link, apiKey) {
     method: "POST",
     url,
     headers: [
-      { name: "Content-Type", value: "application/x-www-form-urlencoded" }
+      { name: "Content-Type", value: "application/x-www-form-urlencoded" },
     ],
     body: {
       type: "string",
-      data: postData
+      data: postData,
     },
     responseType: "text",
-    timeoutMs: 15000
+    timeoutMs: 15000,
   });
 
   if (res.status !== 200) {
-    log.warn("AllDebrid /link/unlock statut HTTP non-200", { status: res.status });
+    log.warn("AllDebrid /link/unlock statut HTTP non-200", {
+      status: res.status,
+    });
     return null;
   }
 
@@ -265,14 +317,14 @@ async function unlockLink(link, apiKey) {
       directUrl: parsed.data.link,
       filename: parsed.data.filename || parsed.data.file,
       filesize: parsed.data.filesize,
-      host: parsed.data.host
+      host: parsed.data.host,
     };
   }
 
   if (parsed.status === "error") {
     log.info("AllDebrid: Lien non débridé", {
       code: parsed.error?.code,
-      message: parsed.error?.message
+      message: parsed.error?.message,
     });
   }
 
@@ -299,7 +351,7 @@ hooks.beforeCreate(async (ctx) => {
         title: "AllDebrid — Configuration requise",
         body: "Veuillez renseigner votre clé API dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
         icon: "warning",
-        urgency: "low"
+        urgency: "low",
       });
     } catch {}
     return ctx;
@@ -308,7 +360,9 @@ hooks.beforeCreate(async (ctx) => {
   try {
     const domains = await getSupportedDomains();
     if (!isSupportedHost(originalUrl, domains)) {
-      log.debug("AllDebrid: Domaine non supporté, pas de débridage", { url: originalUrl });
+      log.debug("AllDebrid: Domaine non supporté, pas de débridage", {
+        url: originalUrl,
+      });
       return ctx;
     }
 
@@ -318,12 +372,12 @@ hooks.beforeCreate(async (ctx) => {
     if (result && result.directUrl) {
       log.info("AllDebrid: Lien débridé avec succès !", {
         directUrl: result.directUrl,
-        filename: result.filename
+        filename: result.filename,
       });
 
       // Seule la liste d'URIs est mise à jour (nom de fichier extrait automatiquement de l'URL CDN)
       ctx.update({
-        uris: [result.directUrl]
+        uris: [result.directUrl],
       });
 
       const showNotif = await config.get("showNotification");
@@ -331,9 +385,11 @@ hooks.beforeCreate(async (ctx) => {
         try {
           await notify.show({
             title: "Lien débridé avec succès !",
-            body: result.filename || "Téléchargement direct haute vitesse AllDebrid.",
+            body:
+              result.filename ||
+              "Téléchargement direct haute vitesse AllDebrid.",
             icon: "success",
-            urgency: "low"
+            urgency: "low",
           });
         } catch {}
       }
@@ -356,3 +412,14 @@ commands.register("community.alldebrid-resolver.checkAccount", async () => {
 lifecycle.onDeactivate(async () => {
   log.info("AllDebrid Resolver désactivé.");
 });
+
+// Exports pour tests unitaires automatisés
+export {
+  shouldSkip,
+  extractHostname,
+  isSupportedHost,
+  unlockLink,
+  getSupportedDomains,
+  getApiKey,
+  checkAccount,
+};
