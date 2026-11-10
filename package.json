@@ -1,6 +1,6 @@
 {
   "name": "motrix-plugin-alldebrid",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "AllDebrid download resolver plugin for Motrix download manager",
   "main": "dist/plugin.js",

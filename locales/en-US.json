@@ -8,5 +8,18 @@
   "settings.enabled.title": "Enable Automatic Unrestricting",
   "settings.enabled.desc": "Automatically intercept and unrestrict supported file hoster links.",
   "settings.showNotification.title": "Show Notifications",
-  "settings.showNotification.desc": "Display notifications when links are unrestricted or account status updates."
+  "settings.showNotification.desc": "Display notifications when links are unrestricted or account status updates.",
+  "notif.unlocked.title": "Link unrestricted successfully!",
+  "notif.unlocked.body": "High-speed direct download via AllDebrid.",
+  "notif.configRequired.title": "AllDebrid — Configuration Required",
+  "notif.configRequired.body": "Please configure your API key in Extensions ➔ AllDebrid Resolver ➔ Settings.",
+  "notif.account.premium.title": "AllDebrid — Premium Active",
+  "notif.account.premium.body": "User: {{username}} | Expires on {{expDate}} ({{days}} days remaining).",
+  "notif.account.nonPremium.title": "AllDebrid — Non-Premium",
+  "notif.account.nonPremium.body": "Account {{username}} verified, but Premium subscription is inactive.",
+  "notif.account.authError.title": "AllDebrid — Authentication Error",
+  "notif.account.authError.body": "Error: {{code}} ({{message}})",
+  "notif.error.title": "AllDebrid — Error",
+  "notif.error.body": "Failed to communicate with AllDebrid (HTTP {{status}})",
+  "notif.error.unknown": "Unable to verify account: {{err}}"
 }

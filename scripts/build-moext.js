@@ -139,11 +139,16 @@ function build() {
     { path: 'dist/plugin.js', data: fs.readFileSync(pluginJsPath) }
   ];
 
-  if (fs.existsSync(localeEnPath)) {
-    filesToPack.push({ path: 'locales/en-US.json', data: fs.readFileSync(localeEnPath) });
-  }
-  if (fs.existsSync(localeFrPath)) {
-    filesToPack.push({ path: 'locales/fr-FR.json', data: fs.readFileSync(localeFrPath) });
+  const localesDir = path.join(rootDir, 'locales');
+  if (fs.existsSync(localesDir)) {
+    for (const file of fs.readdirSync(localesDir)) {
+      if (file.endsWith('.json')) {
+        filesToPack.push({
+          path: `locales/${file}`,
+          data: fs.readFileSync(path.join(localesDir, file))
+        });
+      }
+    }
   }
 
   const moextBuffer = createZipArchive(filesToPack);

@@ -8,5 +8,18 @@
   "settings.enabled.title": "Activer le débridage automatique",
   "settings.enabled.desc": "Intercepte et débride automatiquement les liens d'hébergeurs supportés.",
   "settings.showNotification.title": "Afficher les notifications",
-  "settings.showNotification.desc": "Affiche une notification lors d'un débridage réussi ou du contrôle de l'abonnement."
+  "settings.showNotification.desc": "Affiche une notification lors d'un débridage réussi ou du contrôle de l'abonnement.",
+  "notif.unlocked.title": "Lien débridé avec succès !",
+  "notif.unlocked.body": "Téléchargement direct haute vitesse AllDebrid.",
+  "notif.configRequired.title": "AllDebrid — Configuration requise",
+  "notif.configRequired.body": "Veuillez renseigner votre clé API dans Extensions ➔ AllDebrid Resolver ➔ Paramètres.",
+  "notif.account.premium.title": "AllDebrid — Compte Premium Actif",
+  "notif.account.premium.body": "Utilisateur : {{username}} | Expire le {{expDate}} ({{days}} jours restants).",
+  "notif.account.nonPremium.title": "AllDebrid — Non Premium",
+  "notif.account.nonPremium.body": "Compte {{username}} reconnu, mais l'abonnement Premium a expiré.",
+  "notif.account.authError.title": "AllDebrid — Erreur d'authentification",
+  "notif.account.authError.body": "Erreur : {{code}} ({{message}})",
+  "notif.error.title": "AllDebrid — Erreur",
+  "notif.error.body": "Échec de communication avec AllDebrid (HTTP {{status}})",
+  "notif.error.unknown": "Impossible de vérifier le compte : {{err}}"
 }

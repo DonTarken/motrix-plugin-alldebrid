@@ -53,6 +53,17 @@ export const lifecycle = {
   onDeactivate: () => {}
 };
 
+export const i18n = {
+  language: "en",
+  t: (key, params) => {
+    if (!params) return key;
+    return Object.entries(params).reduce(
+      (acc, [k, v]) => acc.replace(new RegExp(`{{${k}}}`, "g"), String(v)),
+      key
+    );
+  }
+};
+
 function recordLog(level, msg, meta) {
   state.logs.push({ level, msg, meta });
 }

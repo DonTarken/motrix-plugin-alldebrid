@@ -3,7 +3,7 @@
   "manifestVersion": 1,
   "id": "community.alldebrid-resolver",
   "name": "%name%",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "%description%",
   "author": "DonTarken",
   "homepage": "https://github.com/DonTarken/motrix-plugin-alldebrid",

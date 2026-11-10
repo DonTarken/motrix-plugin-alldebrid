@@ -14,6 +14,7 @@ import {
   config,
   hooks,
   http,
+  i18n,
   lifecycle,
   log,
   notify,
@@ -32,6 +33,16 @@ const EXCLUDED_HOSTS = [
   "127.0.0.1",
   "[::1]",
 ];
+
+// Helper to translate notification texts via Motrix's i18n module
+function t(key, params) {
+  try {
+    if (typeof i18n?.t === "function") {
+      return i18n.t(key, params);
+    }
+  } catch {}
+  return key;
+}
 
 // Strict hostname verification (prevents false positives in path or query)
 function shouldSkip(url) {
@@ -111,8 +122,8 @@ async function checkAccount(apiKey, triggerNotification = false) {
     log.warn("AllDebrid: Missing API key");
     if (triggerNotification) {
       await notify.show({
-        title: "AllDebrid",
-        body: "No API key configured. Open Extensions -> AllDebrid Resolver -> Settings.",
+        title: t("notif.configRequired.title"),
+        body: t("notif.configRequired.body"),
         icon: "warning",
       });
     }
@@ -135,8 +146,8 @@ async function checkAccount(apiKey, triggerNotification = false) {
       log.warn("AllDebrid /user unexpected HTTP status", { status: res.status });
       if (triggerNotification) {
         await notify.show({
-          title: "AllDebrid - Error",
-          body: `Failed to connect to AllDebrid (HTTP ${res.status})`,
+          title: t("notif.error.title"),
+          body: t("notif.error.body", { status: res.status }),
           icon: "error",
         });
       }
@@ -158,14 +169,20 @@ async function checkAccount(apiKey, triggerNotification = false) {
       if (triggerNotification) {
         if (u.isPremium) {
           await notify.show({
-            title: "AllDebrid - Premium Active",
-            body: `User: ${u.username} | Expires on ${expDate} (${days} days remaining).`,
+            title: t("notif.account.premium.title"),
+            body: t("notif.account.premium.body", {
+              username: u.username,
+              expDate,
+              days,
+            }),
             icon: "success",
           });
         } else {
           await notify.show({
-            title: "AllDebrid - Non-Premium",
-            body: `Account ${u.username} verified, but Premium subscription is inactive.`,
+            title: t("notif.account.nonPremium.title"),
+            body: t("notif.account.nonPremium.body", {
+              username: u.username,
+            }),
             icon: "error",
           });
         }
@@ -177,8 +194,11 @@ async function checkAccount(apiKey, triggerNotification = false) {
       log.warn("AllDebrid /user error", { code: errCode, message: errMsg });
       if (triggerNotification) {
         await notify.show({
-          title: "AllDebrid - Authentication Error",
-          body: `Error: ${errCode} (${errMsg})`,
+          title: t("notif.account.authError.title"),
+          body: t("notif.account.authError.body", {
+            code: errCode,
+            message: errMsg,
+          }),
           icon: "error",
         });
       }
@@ -187,8 +207,8 @@ async function checkAccount(apiKey, triggerNotification = false) {
     log.error("AllDebrid /user exception", { err: String(e) });
     if (triggerNotification) {
       await notify.show({
-        title: "AllDebrid - Error",
-        body: `Unable to verify account: ${String(e)}`,
+        title: t("notif.error.title"),
+        body: t("notif.error.unknown", { err: String(e) }),
         icon: "error",
       });
     }
@@ -356,8 +376,8 @@ hooks.beforeCreate(async (ctx) => {
     log.warn("AllDebrid: No API key configured.");
     try {
       await notify.show({
-        title: "AllDebrid - Configuration Required",
-        body: "Please set your API key in Extensions -> AllDebrid Resolver -> Settings.",
+        title: t("notif.configRequired.title"),
+        body: t("notif.configRequired.body"),
         icon: "warning",
         urgency: "low",
       });
@@ -394,10 +414,8 @@ hooks.beforeCreate(async (ctx) => {
       if (showNotif !== false) {
         try {
           await notify.show({
-            title: "Link unrestricted successfully",
-            body:
-              result.filename ||
-              "High-speed direct download via AllDebrid.",
+            title: t("notif.unlocked.title"),
+            body: result.filename || t("notif.unlocked.body"),
             icon: "success",
             urgency: "low",
           });
