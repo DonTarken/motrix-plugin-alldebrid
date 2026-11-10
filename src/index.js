@@ -119,10 +119,13 @@ async function checkAccount(apiKey, triggerNotification = false) {
   }
 
   try {
-    const url = `${API_BASE}/user?agent=${AGENT_NAME}&apikey=${encodeURIComponent(apiKey)}`;
+    const url = `${API_BASE}/user?agent=${AGENT_NAME}`;
     const res = await http.request({
       method: "GET",
       url,
+      headers: [
+        { name: "Authorization", value: `Bearer ${apiKey}` },
+      ],
       responseType: "text",
       timeoutMs: 10000,
     });
@@ -290,7 +293,7 @@ function isSupportedHost(url, domains) {
  * Déverrouillage d'un lien via /v4/link/unlock
  */
 async function unlockLink(link, apiKey) {
-  const url = `${API_BASE}/link/unlock?agent=${AGENT_NAME}&apikey=${encodeURIComponent(apiKey)}`;
+  const url = `${API_BASE}/link/unlock?agent=${AGENT_NAME}`;
   const postData = `link=${encodeURIComponent(link)}`;
 
   const res = await http.request({
@@ -298,6 +301,7 @@ async function unlockLink(link, apiKey) {
     url,
     headers: [
       { name: "Content-Type", value: "application/x-www-form-urlencoded" },
+      { name: "Authorization", value: `Bearer ${apiKey}` },
     ],
     body: {
       type: "string",
@@ -364,17 +368,19 @@ hooks.beforeCreate(async (ctx) => {
     const domains = await getSupportedDomains();
     if (!isSupportedHost(originalUrl, domains)) {
       log.debug("AllDebrid: Domaine non supporté, pas de débridage", {
-        url: originalUrl,
+        host: extractHostname(originalUrl),
       });
       return ctx;
     }
 
-    log.info("AllDebrid: Débridage en cours...", { url: originalUrl });
+    log.info("AllDebrid: Débridage en cours...", {
+      host: extractHostname(originalUrl),
+    });
     const result = await unlockLink(originalUrl, apiKey);
 
     if (result && result.directUrl) {
       log.info("AllDebrid: Lien débridé avec succès !", {
-        directUrl: result.directUrl,
+        host: extractHostname(result.directUrl),
         filename: result.filename,
       });
 
