@@ -5,13 +5,9 @@
 # AllDebrid Resolver Plugin for Motrix
 
 <p align="center">
-  <img src="assets/alldebrid-logo.png" alt="AllDebrid Logo" width="180" />
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/motrix-logo.png" alt="Motrix Logo" width="80" />
-</p>
-
-<p align="center">
-  <b>Unrestrict and download files at full gigabit fiber speed within a sleek, modern UI.</b>
+  <img src="assets/alldebrid-logo.png" alt="AllDebrid Logo" height="38" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/motrix-logo.png" alt="Motrix Logo" height="38" />
 </p>
 
 <p align="center">
