@@ -2,12 +2,12 @@
   <img src="assets/social-preview.jpg" alt="Motrix AllDebrid Resolver Plugin" width="100%" />
 </p>
 
-# Plugin AllDebrid pour Motrix ⚡
+# Plugin AllDebrid pour Motrix
 
 <p align="center">
-  <img src="https://alldebrid.com/static/images/logo.png" alt="AllDebrid Logo" width="180" />
+  <img src="assets/alldebrid-logo.png" alt="AllDebrid Logo" width="180" />
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://motrix.app/release.ico" alt="Motrix Logo" width="80" />
+  <img src="assets/motrix-logo.png" alt="Motrix Logo" width="80" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ---
 
-## ⚡ Pourquoi ce plugin ?
+## Pourquoi ce plugin ?
 
 Vous utilisez **Motrix** comme gestionnaire de téléchargement et vous possédez un compte premium **AllDebrid** ?
 
@@ -43,7 +43,7 @@ Ce plugin officiel autonome (`.moext`) transforme Motrix en une alternative mode
 
 ### Étape 1 : Installer l'extension dans Motrix (au choix)
 
-#### ⚡ Méthode A : Directement via GitHub (Recommandée — la plus simple)
+#### Méthode A : Directement via GitHub (Recommandée — la plus simple)
 1. Ouvrez **Motrix** et cliquez sur l'onglet **« Extensions »** dans la barre latérale gauche (icône 📦 sous *Trackers*).
 2. Cliquez sur le bouton **`+`** tout en haut à droite pour ouvrir la fenêtre *« Ajouter une extension »*.
 3. Dans le champ, saisissez simplement le nom du dépôt :

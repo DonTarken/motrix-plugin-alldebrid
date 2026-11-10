@@ -2,12 +2,12 @@
   <img src="assets/social-preview.jpg" alt="Motrix AllDebrid Resolver Plugin" width="100%" />
 </p>
 
-# AllDebrid Resolver Plugin for Motrix ⚡
+# AllDebrid Resolver Plugin for Motrix
 
 <p align="center">
-  <img src="https://alldebrid.com/static/images/logo.png" alt="AllDebrid Logo" width="180" />
+  <img src="assets/alldebrid-logo.png" alt="AllDebrid Logo" width="180" />
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://motrix.app/release.ico" alt="Motrix Logo" width="80" />
+  <img src="assets/motrix-logo.png" alt="Motrix Logo" width="80" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ---
 
-## ⚡ Why Use This Plugin?
+## Why Use This Plugin?
 
 Do you use **Motrix** as your daily download manager and hold an **AllDebrid** premium subscription?
 
@@ -43,7 +43,7 @@ This autonomous official plugin (`.moext`) transforms Motrix into a modern, ligh
 
 ### Step 1: Install the Extension in Motrix (Choose One)
 
-#### ⚡ Method A: Directly via GitHub (Recommended — Fastest)
+#### Method A: Directly via GitHub (Recommended — Fastest)
 1. Open **Motrix** and click on the **"Extensions"** tab in the left navigation sidebar (package icon 📦 below *Trackers*).
 2. Click the **`+`** button in the upper-right corner to open the *"Add an extension"* modal.
 3. In the input field, simply enter the repository name:
