@@ -1,4 +1,4 @@
-// Mock de l'API native "motrix:plugin-api" pour les tests automatisés
+// Mock implementation of native "motrix:plugin-api" for automated test suites
 
 export const state = {
   registeredCommands: new Map(),

@@ -1,8 +1,9 @@
 /**
  * Motrix AllDebrid Resolver Plugin
  *
- * Intercepte automatiquement les liens d'hébergeurs supportés ajoutés dans Motrix,
- * les débride via l'API officielle AllDebrid v4, et transmet le lien direct haute vitesse à Aria2.
+ * Automatically intercepts supported host links added to Motrix,
+ * resolves them via the official AllDebrid v4 API, and passes
+ * the high-speed direct download link to Aria2.
  *
  * @author DonTarken
  * @license MIT
@@ -22,7 +23,7 @@ import {
 const AGENT_NAME = "motrix-alldebrid";
 const API_BASE = "https://api.alldebrid.com/v4";
 
-// Domaines racines AllDebrid & dérivés à exclure strictement du débridage
+// AllDebrid domains & aliases excluded from unrestricting
 const EXCLUDED_HOSTS = [
   "alldebrid.com",
   "alldeb.ovh",
@@ -32,12 +33,12 @@ const EXCLUDED_HOSTS = [
   "[::1]",
 ];
 
-// Vérification stricte du nom d'hôte (évite les faux positifs dans le chemin ou la query)
+// Strict hostname verification (prevents false positives in path or query)
 function shouldSkip(url) {
   if (!url || typeof url !== "string") return true;
   const lower = url.trim().toLowerCase();
 
-  // Protocoles non-HTTP
+  // Non-HTTP protocols
   if (
     lower.startsWith("data:") ||
     lower.startsWith("blob:") ||
@@ -58,7 +59,7 @@ function shouldSkip(url) {
   return false;
 }
 
-// Formatage de la date d'expiration
+// Format expiration timestamp
 function formatUnixTimestamp(ts) {
   if (!ts || isNaN(ts)) return "N/A";
   const d = new Date(ts * 1000);
@@ -68,7 +69,7 @@ function formatUnixTimestamp(ts) {
   return `${day}/${month}/${year}`;
 }
 
-// Calcul des jours restants
+// Calculate remaining days
 function getDaysRemaining(ts) {
   if (!ts || isNaN(ts)) return 0;
   const diff = ts * 1000 - Date.now();
@@ -76,9 +77,9 @@ function getDaysRemaining(ts) {
 }
 
 /**
- * Récupération de la clé API AllDebrid :
- * 1. Depuis les paramètres de l'extension (config.get("apiKey"))
- * 2. Repli éventuel depuis le stockage persistant (storage.get("apiKey"))
+ * Retrieve AllDebrid API key:
+ * 1. From extension configuration (config.get("apiKey"))
+ * 2. Fallback to persistent storage (storage.get("apiKey"))
  */
 async function getApiKey() {
   try {
@@ -87,7 +88,7 @@ async function getApiKey() {
       return fromConfig.trim();
     }
   } catch (e) {
-    log.debug("Lecture config impossible", { err: String(e) });
+    log.debug("Failed to read config", { err: String(e) });
   }
 
   try {
@@ -96,22 +97,22 @@ async function getApiKey() {
       return stored.trim();
     }
   } catch (e) {
-    log.debug("Lecture storage impossible", { err: String(e) });
+    log.debug("Failed to read storage", { err: String(e) });
   }
 
   return null;
 }
 
 /**
- * Vérification du compte et de l'abonnement Premium via l'API AllDebrid /v4/user
+ * Verify account and Premium subscription via /v4/user
  */
 async function checkAccount(apiKey, triggerNotification = false) {
   if (!apiKey) {
-    log.warn("AllDebrid: Clé API manquante");
+    log.warn("AllDebrid: Missing API key");
     if (triggerNotification) {
       await notify.show({
         title: "AllDebrid",
-        body: "Aucune clé API configurée. Rendez-vous dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
+        body: "No API key configured. Open Extensions -> AllDebrid Resolver -> Settings.",
         icon: "warning",
       });
     }
@@ -131,11 +132,11 @@ async function checkAccount(apiKey, triggerNotification = false) {
     });
 
     if (res.status !== 200) {
-      log.warn("AllDebrid /user statut HTTP inattendu", { status: res.status });
+      log.warn("AllDebrid /user unexpected HTTP status", { status: res.status });
       if (triggerNotification) {
         await notify.show({
-          title: "AllDebrid — Erreur",
-          body: `Échec de communication avec AllDebrid (HTTP ${res.status})`,
+          title: "AllDebrid - Error",
+          body: `Failed to connect to AllDebrid (HTTP ${res.status})`,
           icon: "error",
         });
       }
@@ -148,7 +149,7 @@ async function checkAccount(apiKey, triggerNotification = false) {
       const days = getDaysRemaining(u.premiumUntil);
       const expDate = formatUnixTimestamp(u.premiumUntil);
 
-      log.info("AllDebrid: Compte validé", {
+      log.info("AllDebrid: Account validated", {
         username: u.username,
         isPremium: u.isPremium,
         daysRemaining: days,
@@ -157,14 +158,14 @@ async function checkAccount(apiKey, triggerNotification = false) {
       if (triggerNotification) {
         if (u.isPremium) {
           await notify.show({
-            title: "AllDebrid — Compte Premium Actif",
-            body: `Utilisateur : ${u.username} | Expire le ${expDate} (${days} jours restants).`,
+            title: "AllDebrid - Premium Active",
+            body: `User: ${u.username} | Expires on ${expDate} (${days} days remaining).`,
             icon: "success",
           });
         } else {
           await notify.show({
-            title: "AllDebrid — Non Premium",
-            body: `Compte ${u.username} reconnu, mais l'abonnement Premium a expiré.`,
+            title: "AllDebrid - Non-Premium",
+            body: `Account ${u.username} verified, but Premium subscription is inactive.`,
             icon: "error",
           });
         }
@@ -172,12 +173,12 @@ async function checkAccount(apiKey, triggerNotification = false) {
       return u;
     } else if (parsed.status === "error") {
       const errCode = parsed.error?.code || "UNKNOWN";
-      const errMsg = parsed.error?.message || "Erreur inconnue";
-      log.warn("AllDebrid /user erreur", { code: errCode, message: errMsg });
+      const errMsg = parsed.error?.message || "Unknown error";
+      log.warn("AllDebrid /user error", { code: errCode, message: errMsg });
       if (triggerNotification) {
         await notify.show({
-          title: "AllDebrid — Erreur d'authentification",
-          body: `Erreur : ${errCode} (${errMsg})`,
+          title: "AllDebrid - Authentication Error",
+          body: `Error: ${errCode} (${errMsg})`,
           icon: "error",
         });
       }
@@ -186,8 +187,8 @@ async function checkAccount(apiKey, triggerNotification = false) {
     log.error("AllDebrid /user exception", { err: String(e) });
     if (triggerNotification) {
       await notify.show({
-        title: "AllDebrid — Erreur",
-        body: `Impossible de vérifier le compte : ${String(e)}`,
+        title: "AllDebrid - Error",
+        body: `Unable to verify account: ${String(e)}`,
         icon: "error",
       });
     }
@@ -196,11 +197,11 @@ async function checkAccount(apiKey, triggerNotification = false) {
 }
 
 /**
- * Gestion du cache des hébergeurs supportés (/v4/hosts)
+ * Supported hosts cache management (/v4/hosts)
  */
 let cachedDomains = null;
 let lastHostsRefresh = 0;
-const HOSTS_CACHE_TTL = 3600000; // 1 heure
+const HOSTS_CACHE_TTL = 3600000; // 1 hour
 
 async function getSupportedDomains() {
   const now = Date.now();
@@ -232,14 +233,14 @@ async function getSupportedDomains() {
         }
         cachedDomains = domains;
         lastHostsRefresh = now;
-        log.info("AllDebrid: Liste des hébergeurs rafraîchie", {
+        log.info("AllDebrid: Refreshed supported hosts list", {
           count: domains.size,
         });
         return domains;
       }
     }
   } catch (e) {
-    log.warn("AllDebrid: Échec de récupération de la liste des hébergeurs", {
+    log.warn("AllDebrid: Failed to fetch supported hosts list", {
       err: String(e),
     });
   }
@@ -249,18 +250,18 @@ async function getSupportedDomains() {
 
 function extractHostname(url) {
   if (!url || typeof url !== "string") return "";
-  // Extraction de l'autorité entre :// et le premier /, ? ou #
+  // Extract authority between :// and first /, ? or #
   const match = url.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);
   if (!match) return "";
 
   let host = match[1].toLowerCase();
 
-  // Retrait des credentials éventuels (user:pass@host)
+  // Strip user credentials (user:pass@host)
   if (host.includes("@")) {
     host = host.split("@").pop();
   }
 
-  // Gestion des adresses IPv6 entre crochets [::1]:port
+  // Handle bracketed IPv6 addresses [::1]:port
   if (host.startsWith("[")) {
     const bracketEnd = host.indexOf("]");
     if (bracketEnd !== -1) {
@@ -268,7 +269,7 @@ function extractHostname(url) {
     }
   }
 
-  // Retrait du port (host:8080)
+  // Strip port (host:8080)
   if (host.includes(":")) {
     host = host.split(":")[0];
   }
@@ -276,7 +277,7 @@ function extractHostname(url) {
 }
 
 function isSupportedHost(url, domains) {
-  // Fail closed : si la liste est absente ou vide, on refuse systématiquement
+  // Fail closed: reject if host list is missing or empty
   if (!domains || domains.size === 0) return false;
 
   const host = extractHostname(url);
@@ -290,7 +291,7 @@ function isSupportedHost(url, domains) {
 }
 
 /**
- * Déverrouillage d'un lien via /v4/link/unlock
+ * Unrestrict download link via /v4/link/unlock
  */
 async function unlockLink(link, apiKey) {
   const url = `${API_BASE}/link/unlock?agent=${AGENT_NAME}`;
@@ -312,7 +313,7 @@ async function unlockLink(link, apiKey) {
   });
 
   if (res.status !== 200) {
-    log.warn("AllDebrid /link/unlock statut HTTP non-200", {
+    log.warn("AllDebrid /link/unlock non-200 HTTP status", {
       status: res.status,
     });
     return null;
@@ -329,7 +330,7 @@ async function unlockLink(link, apiKey) {
   }
 
   if (parsed.status === "error") {
-    log.info("AllDebrid: Lien non débridé", {
+    log.info("AllDebrid: Link could not be unrestricted", {
       code: parsed.error?.code,
       message: parsed.error?.message,
     });
@@ -339,7 +340,7 @@ async function unlockLink(link, apiKey) {
 }
 
 /**
- * Hook beforeCreate : Interception et réécriture du lien de téléchargement
+ * beforeCreate hook: intercept and rewrite download link
  */
 hooks.beforeCreate(async (ctx) => {
   if (ctx.type !== "http") return ctx;
@@ -352,11 +353,11 @@ hooks.beforeCreate(async (ctx) => {
 
   const apiKey = await getApiKey();
   if (!apiKey) {
-    log.warn("AllDebrid: Aucune clé API configurée.");
+    log.warn("AllDebrid: No API key configured.");
     try {
       await notify.show({
-        title: "AllDebrid — Configuration requise",
-        body: "Veuillez renseigner votre clé API dans Extensions ➔ AllDebrid Resolver ➔ Ouvrir.",
+        title: "AllDebrid - Configuration Required",
+        body: "Please set your API key in Extensions -> AllDebrid Resolver -> Settings.",
         icon: "warning",
         urgency: "low",
       });
@@ -367,24 +368,24 @@ hooks.beforeCreate(async (ctx) => {
   try {
     const domains = await getSupportedDomains();
     if (!isSupportedHost(originalUrl, domains)) {
-      log.debug("AllDebrid: Domaine non supporté, pas de débridage", {
+      log.debug("AllDebrid: Unsupported host, skipping", {
         host: extractHostname(originalUrl),
       });
       return ctx;
     }
 
-    log.info("AllDebrid: Débridage en cours...", {
+    log.info("AllDebrid: Unrestricting link...", {
       host: extractHostname(originalUrl),
     });
     const result = await unlockLink(originalUrl, apiKey);
 
     if (result && result.directUrl) {
-      log.info("AllDebrid: Lien débridé avec succès !", {
+      log.info("AllDebrid: Link unrestricted successfully", {
         host: extractHostname(result.directUrl),
         filename: result.filename,
       });
 
-      // Seule la liste d'URIs est mise à jour (nom de fichier extrait automatiquement de l'URL CDN)
+      // Update URIs (filename is extracted automatically from CDN response)
       ctx.update({
         uris: [result.directUrl],
       });
@@ -393,10 +394,10 @@ hooks.beforeCreate(async (ctx) => {
       if (showNotif !== false) {
         try {
           await notify.show({
-            title: "Lien débridé avec succès !",
+            title: "Link unrestricted successfully",
             body:
               result.filename ||
-              "Téléchargement direct haute vitesse AllDebrid.",
+              "High-speed direct download via AllDebrid.",
             icon: "success",
             urgency: "low",
           });
@@ -404,14 +405,14 @@ hooks.beforeCreate(async (ctx) => {
       }
     }
   } catch (err) {
-    log.error("AllDebrid: Erreur inattendue", { err: String(err) });
+    log.error("AllDebrid: Unexpected error", { err: String(err) });
   }
 
   return ctx;
 });
 
 /**
- * Commande manuelle pour vérifier l'état du compte
+ * Manual command to check account status
  */
 commands.register("community.alldebrid-resolver.checkAccount", async () => {
   const apiKey = await getApiKey();
@@ -419,10 +420,10 @@ commands.register("community.alldebrid-resolver.checkAccount", async () => {
 });
 
 lifecycle.onDeactivate(async () => {
-  log.info("AllDebrid Resolver désactivé.");
+  log.info("AllDebrid Resolver deactivated.");
 });
 
-// Exports pour tests unitaires automatisés
+// Exports for automated unit tests
 export {
   shouldSkip,
   extractHostname,
