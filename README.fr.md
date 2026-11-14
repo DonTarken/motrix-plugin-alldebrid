@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+  <a href="https://motrix.app/plugins/community.alldebrid-resolver"><img src="https://img.shields.io/badge/Motrix%20Registry-Extension%20Officielle-00D26A?style=for-the-badge&logo=electron&logoColor=white" alt="Registre Motrix" /></a>
   <a href="https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest"><img src="https://img.shields.io/github/v/release/DonTarken/motrix-plugin-alldebrid?label=Derni%C3%A8re%20version&color=success&style=for-the-badge" alt="Dernière version" /></a>
   <a href="https://motrix.app"><img src="https://img.shields.io/badge/Motrix-%3E%3D%202.0.0-orange?style=for-the-badge" alt="Motrix 2.0+" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/Licence-MIT-blue?style=for-the-badge" alt="Licence MIT" /></a>
@@ -39,22 +40,28 @@ Ce plugin officiel autonome (`.moext`) transforme Motrix en une alternative mode
 
 ### Étape 1 : Installer l'extension dans Motrix (au choix)
 
-#### Méthode A : Directement via GitHub (Recommandée — la plus simple)
-1. Ouvrez **Motrix** et cliquez sur l'onglet **« Extensions »** dans la barre latérale gauche (icône 📦 sous *Trackers*).
-2. Cliquez sur le bouton **`+`** tout en haut à droite pour ouvrir la fenêtre *« Ajouter une extension »*.
-3. Dans le champ, saisissez simplement le nom du dépôt :
-   ```text
-   DonTarken/motrix-plugin-alldebrid
-   ```
-   *(Le badge en bas affichera **`Type détecté : GitHub`** — veillez à ne pas mettre `https://` devant pour que Motrix interroge directement les releases GitHub).*
-4. Cliquez sur l'icône loupe 🔍 en bas à droite (ou appuyez sur Entrée). Motrix télécharge automatiquement la dernière version officielle et vous demande de confirmer l'installation !
+#### 🌟 Méthode A : Installation en 1 clic dans Motrix (Recommandée — la plus simple)
+AllDebrid Resolver est officiellement validé et intégré au catalogue officiel d'extensions de Motrix :
+1. Ouvrez **Motrix (2.0+)** et cliquez sur l'onglet **« Extensions »** dans la barre latérale gauche (icône 📦 sous *Trackers*).
+2. Dans la section **« Extensions disponibles »** (ou en cherchant *AllDebrid* dans la barre de recherche en haut), cliquez sur **AllDebrid Resolver**.
+3. Cliquez sur le bouton **« Installer »**. Motrix télécharge et active immédiatement l'extension !
 
 ---
 
-#### 📁 Méthode B : Par fichier `.moext` local
+#### 📦 Méthode B : Directement via GitHub
+1. Ouvrez Motrix ➔ onglet **Extensions** ➔ cliquez sur le bouton **`+`** en haut à droite.
+2. Dans le champ, saisissez simplement le nom du dépôt :
+   ```text
+   DonTarken/motrix-plugin-alldebrid
+   ```
+3. Cliquez sur la loupe 🔍 (ou Entrée) et confirmez l'installation.
+
+---
+
+#### 📁 Méthode C : Par fichier `.moext` local
 1. 👉 **[Téléchargez `alldebrid-resolver.moext`](https://github.com/DonTarken/motrix-plugin-alldebrid/releases/latest/download/alldebrid-resolver.moext)** (dernière version).
 2. Dans Motrix ➔ onglet **Extensions** ➔ cliquez sur le bouton **`+`** en haut à droite.
-3. **Glissez-déposez** le fichier téléchargé directement dans le champ de la fenêtre, ou cliquez sur l'icône trombone 📎 pour le sélectionner sur votre disque.
+3. **Glissez-déposez** le fichier téléchargé directement dans le champ (ou cliquez sur le trombone 📎).
 4. Confirmez l'installation.
 
 ---
