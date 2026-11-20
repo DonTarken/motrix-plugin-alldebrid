@@ -3,7 +3,7 @@
   "manifestVersion": 1,
   "id": "community.alldebrid-resolver",
   "name": "%name%",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "%description%",
   "author": "DonTarken",
   "homepage": "https://github.com/DonTarken/motrix-plugin-alldebrid",
@@ -18,7 +18,7 @@
   "requestedHeapMB": 32,
   "permissions": ["http", "notify", "storage"],
   "hostPermissions": ["*://*/*"],
-  "activationEvents": ["onTaskType:http", "onProtocol:https", "onStartup"],
+  "activationEvents": ["onTaskType:http", "onProtocol:https", "onProtocol:http", "onStartup"],
   "contributes": {
     "commands": [
       {
