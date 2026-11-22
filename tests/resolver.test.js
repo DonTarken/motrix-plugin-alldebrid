@@ -6,7 +6,9 @@ import {
   isSupportedHost,
   unlockLink,
   getSupportedDomains,
-  resetHostsCache
+  resetHostsCache,
+  getApiKey,
+  extractKeyFromSetupUrl
 } from "../src/index.js";
 import { state, resetMockState } from "./mock-api.mjs";
 
@@ -198,5 +200,102 @@ describe("Network Security, Bearer Auth & Diagnostic Sanitization", () => {
     const domains = await getSupportedDomains();
     assert.ok(domains === null || domains instanceof Set);
     assert.equal(isSupportedHost("https://unsupported-host.org/test", domains), false);
+  });
+});
+
+describe("API Key Extraction, Storage Persistence & Setup URLs", () => {
+  const sampleKey = "ad_apikey_1234567890abcdef12345678";
+
+  beforeEach(() => {
+    resetMockState();
+    resetHostsCache();
+  });
+
+  it("extracts API key from setup URL formats", () => {
+    assert.equal(extractKeyFromSetupUrl(`https://alldebrid.com/set-key/${sampleKey}`), sampleKey);
+    assert.equal(extractKeyFromSetupUrl(`https://alldebrid.com/?apikey=${sampleKey}`), sampleKey);
+    assert.equal(extractKeyFromSetupUrl(`https://alldebrid.com/?token=${sampleKey}`), sampleKey);
+    assert.equal(extractKeyFromSetupUrl(`ad://${sampleKey}`), sampleKey);
+    assert.equal(extractKeyFromSetupUrl("https://rapidgator.net/file/123"), null);
+  });
+
+  it("reads API key from storage when config is empty", async () => {
+    state.configStore.delete("apiKey");
+    state.storageStore.set("apiKey", sampleKey);
+
+    const key = await getApiKey();
+    assert.equal(key, sampleKey);
+  });
+
+  it("warns user and aborts task when API key is missing on supported host", async () => {
+    state.configStore.delete("apiKey");
+    state.storageStore.delete("apiKey");
+
+    state.httpMockResponse = (opts) => {
+      if (opts.url.includes("/hosts")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            status: "success",
+            data: { hosts: { rapidgator: { domains: ["rapidgator.net"] } } }
+          })
+        };
+      }
+      return { status: 404, body: "{}" };
+    };
+
+    const ctx = {
+      type: "http",
+      uris: ["https://rapidgator.net/file/123"],
+      update: (patch) => { Object.assign(ctx, patch); }
+    };
+
+    await assert.rejects(
+      async () => { await state.beforeCreateHook(ctx); },
+      /AllDebrid: No API key configured/
+    );
+
+    assert.equal(state.notifications.length, 1);
+    assert.equal(state.notifications[0].title, "notif.configRequired.title");
+  });
+
+  it("aborts task when unlock returns an error", async () => {
+    state.configStore.set("apiKey", sampleKey);
+
+    state.httpMockResponse = (opts) => {
+      if (opts.url.includes("/hosts")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            status: "success",
+            data: { hosts: { turbobit: { domains: ["turbobit.net"] } } }
+          })
+        };
+      }
+      if (opts.url.includes("/link/unlock")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            status: "error",
+            error: { code: "LINK_DEAD", message: "This file is no longer available" }
+          })
+        };
+      }
+      return { status: 404, body: "{}" };
+    };
+
+    const ctx = {
+      type: "http",
+      uris: ["https://turbobit.net/download/abc.zip"],
+      update: (patch) => { Object.assign(ctx, patch); }
+    };
+
+    await assert.rejects(
+      async () => { await state.beforeCreateHook(ctx); },
+      /AllDebrid: Debriding failed/
+    );
+
+    assert.equal(state.notifications.length, 1);
+    assert.equal(state.notifications[0].icon, "error");
   });
 });

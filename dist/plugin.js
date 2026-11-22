@@ -96,7 +96,8 @@ async function getApiKey() {
   try {
     const fromConfig = await config.get("apiKey");
     if (fromConfig && typeof fromConfig === "string" && fromConfig.trim()) {
-      return fromConfig.trim();
+      const trimmed = fromConfig.trim();
+      if (!trimmed.startsWith("box:")) return trimmed;
     }
   } catch (e) {
     log.debug("Failed to read config", { err: String(e) });
@@ -107,9 +108,50 @@ async function getApiKey() {
     if (stored && typeof stored === "string" && stored.trim()) {
       return stored.trim();
     }
+    if (stored && typeof stored.value === "string" && stored.value.trim()) {
+      return stored.value.trim();
+    }
   } catch (e) {
     log.debug("Failed to read storage", { err: String(e) });
   }
+
+  return "";
+}
+
+// Extract API key from one-time setup URLs (e.g. ad://<key> or https://alldebrid.com/set-key/<key>)
+function extractKeyFromSetupUrl(url) {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+
+  // Scheme: ad://<key> or ad://set-key/<key> or ad:key:<key>
+  const adSchemeMatch = trimmed.match(/^ad:(?:\/\/(?:set-key\/)?)?([A-Za-z0-9_-]{20,})/i);
+  if (adSchemeMatch) return adSchemeMatch[1];
+
+  // HTTP/HTTPS URL on alldebrid domains
+  try {
+    const match = trimmed.match(/^https?:\/\/([^/?#]+)([^?#]*)(?:\?([^#]*))?/i);
+    if (!match) return null;
+    const host = match[1].toLowerCase();
+    if (host !== "alldebrid.com" && host !== "api.alldebrid.com") return null;
+
+    const pathname = match[2] || "";
+    const search = match[3] || "";
+
+    const pathMatch = pathname.match(/^\/set-?key\/([A-Za-z0-9_-]{20,})/i);
+    if (pathMatch) return pathMatch[1];
+
+    if (search) {
+      const params = search.split("&");
+      for (const p of params) {
+        const [k, v] = p.split("=");
+        if (["token", "apikey", "api_key", "key"].includes(k?.toLowerCase())) {
+          if (v && /^[A-Za-z0-9_-]{20,}$/.test(v)) {
+            return decodeURIComponent(v);
+          }
+        }
+      }
+    }
+  } catch {}
 
   return null;
 }
@@ -317,31 +359,46 @@ async function unlockLink(link, apiKey) {
   const url = `${API_BASE}/link/unlock?agent=${AGENT_NAME}`;
   const postData = `link=${encodeURIComponent(link)}`;
 
-  const res = await http.request({
-    method: "POST",
-    url,
-    headers: [
-      { name: "Content-Type", value: "application/x-www-form-urlencoded" },
-      { name: "Authorization", value: `Bearer ${apiKey}` },
-    ],
-    body: {
-      type: "string",
-      data: postData,
-    },
-    responseType: "text",
-    timeoutMs: 15000,
-  });
+  let res;
+  try {
+    res = await http.request({
+      method: "POST",
+      url,
+      headers: [
+        { name: "Content-Type", value: "application/x-www-form-urlencoded" },
+        { name: "Authorization", value: `Bearer ${apiKey}` },
+      ],
+      body: {
+        type: "string",
+        data: postData,
+      },
+      responseType: "text",
+      timeoutMs: 15000,
+    });
+  } catch (err) {
+    log.error("AllDebrid: Network request failed during unlock", {
+      err: String(err),
+    });
+    return { ok: false, error: "network_error", message: String(err) };
+  }
 
   if (res.status !== 200) {
     log.warn("AllDebrid /link/unlock non-200 HTTP status", {
       status: res.status,
     });
-    return null;
+    return { ok: false, error: `HTTP_${res.status}`, message: `HTTP ${res.status}` };
   }
 
-  const parsed = JSON.parse(res.body);
+  let parsed;
+  try {
+    parsed = JSON.parse(res.body);
+  } catch (err) {
+    return { ok: false, error: "invalid_response", message: "Invalid JSON response" };
+  }
+
   if (parsed.status === "success" && parsed.data?.link) {
     return {
+      ok: true,
       directUrl: parsed.data.link,
       filename: parsed.data.filename || parsed.data.file,
       filesize: parsed.data.filesize,
@@ -354,9 +411,14 @@ async function unlockLink(link, apiKey) {
       code: parsed.error?.code,
       message: parsed.error?.message,
     });
+    return {
+      ok: false,
+      error: parsed.error?.code || "unknown",
+      message: parsed.error?.message || "Failed to unlock link",
+    };
   }
 
-  return null;
+  return { ok: false, error: "unknown", message: "No download URL returned" };
 }
 
 /**
@@ -366,40 +428,87 @@ hooks.beforeCreate(async (ctx) => {
   if (ctx.type !== "http") return ctx;
 
   const originalUrl = ctx.uris?.[0];
-  if (!originalUrl || shouldSkip(originalUrl)) return ctx;
+  if (!originalUrl) return ctx;
+
+  // 1. One-time setup command URL: paste https://alldebrid.com/set-key/<TOKEN> into Motrix
+  const setupKey = extractKeyFromSetupUrl(originalUrl);
+  if (setupKey) {
+    log.info("AllDebrid: Processing API key configuration via setup URL");
+    const account = await checkAccount(setupKey, false);
+    if (account && account.username) {
+      await storage.set("apiKey", setupKey);
+      log.info("AllDebrid: API key registered successfully in storage", {
+        username: account.username,
+      });
+      try {
+        await notify.show({
+          title: t("notif.keyRegistered.title"),
+          body: t("notif.keyRegistered.body", {
+            username: account.username,
+            expDate: formatUnixTimestamp(account.premiumUntil),
+          }),
+          icon: "success",
+          urgency: "high",
+        });
+      } catch {}
+      throw new Error(
+        `AllDebrid: Clé API enregistrée avec succès pour ${account.username} ! Téléchargement ignoré.`
+      );
+    } else {
+      log.warn("AllDebrid: Invalid API key provided in setup URL");
+      try {
+        await notify.show({
+          title: t("notif.configRequired.title"),
+          body: t("notif.invalidKey.body"),
+          icon: "error",
+          urgency: "high",
+        });
+      } catch {}
+      throw new Error("AllDebrid: Clé API AllDebrid invalide. Téléchargement ignoré.");
+    }
+  }
+
+  // 2. Standard exclusions (local addresses, magnets, debrid services)
+  if (shouldSkip(originalUrl)) return ctx;
 
   const enabled = await config.get("enabled");
   if (enabled === false) return ctx;
 
+  // 3. Supported host check (fail-closed)
+  const domains = await getSupportedDomains();
+  if (!isSupportedHost(originalUrl, domains)) {
+    log.debug("AllDebrid: Unsupported host, skipping", {
+      host: extractHostname(originalUrl),
+    });
+    return ctx;
+  }
+
+  // 4. Host is supported — an API key is strictly required
   const apiKey = await getApiKey();
   if (!apiKey) {
-    log.warn("AllDebrid: No API key configured.");
+    log.warn("AllDebrid: No API key configured for supported host", {
+      host: extractHostname(originalUrl),
+    });
     try {
       await notify.show({
         title: t("notif.configRequired.title"),
         body: t("notif.configRequired.body"),
         icon: "warning",
-        urgency: "low",
+        urgency: "high",
       });
     } catch {}
-    return ctx;
+    throw new Error(
+      "AllDebrid: No API key configured. Task aborted to prevent downloading HTML page."
+    );
   }
 
   try {
-    const domains = await getSupportedDomains();
-    if (!isSupportedHost(originalUrl, domains)) {
-      log.debug("AllDebrid: Unsupported host, skipping", {
-        host: extractHostname(originalUrl),
-      });
-      return ctx;
-    }
-
     log.info("AllDebrid: Unrestricting link...", {
       host: extractHostname(originalUrl),
     });
     const result = await unlockLink(originalUrl, apiKey);
 
-    if (result && result.directUrl) {
+    if (result && result.ok && result.directUrl) {
       log.info("AllDebrid: Link unrestricted successfully", {
         host: extractHostname(result.directUrl),
         filename: result.filename,
@@ -421,12 +530,37 @@ hooks.beforeCreate(async (ctx) => {
           });
         } catch {}
       }
+      return ctx;
     }
-  } catch (err) {
-    log.error("AllDebrid: Unexpected error", { err: String(err) });
-  }
 
-  return ctx;
+    // Unlock failed with an API error
+    const errorCode = result?.error || "unknown";
+    const errorBody = result?.message || errorCode;
+
+    log.warn("AllDebrid: Debriding failed, aborting task to avoid HTML file download", {
+      code: errorCode,
+      message: errorBody,
+    });
+
+    try {
+      await notify.show({
+        title: t("notif.unrestrictFailed.title"),
+        body: `${errorCode}: ${errorBody}`,
+        icon: "error",
+        urgency: "normal",
+      });
+    } catch {}
+
+    throw new Error(
+      `AllDebrid: Debriding failed (${errorCode}: ${errorBody}). Task aborted to prevent downloading HTML page.`
+    );
+  } catch (err) {
+    if (String(err).includes("AllDebrid:")) {
+      throw err;
+    }
+    log.error("AllDebrid: Unexpected error", { err: String(err) });
+    return ctx;
+  }
 });
 
 /**
@@ -455,5 +589,6 @@ export {
   getSupportedDomains,
   resetHostsCache,
   getApiKey,
+  extractKeyFromSetupUrl,
   checkAccount,
 };
